@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 
+// to read the input file
 const readInput = async (filename) => {
   const file = await fs.readFileSync(path.join(__dirname, filename), {
     encoding: "utf-8",
@@ -11,6 +12,7 @@ const readInput = async (filename) => {
   return inputs;
 };
 
+// in order to split each robot into an array as [[x, y, orientation], [moves]]
 const getRobots = (arr, numOfOps, newArr = new Array()) => {
   if (arr.length % 2 !== 0) throw new Error("must be even");
   if (numOfOps === 0) return newArr;
@@ -37,6 +39,7 @@ const orientationObj = {
   },
 };
 
+// calculates the robot's final position
 const getFinalPosition = (robot, xGrid, yGrid, lostPositions) => {
   let [xPos, yPos, orientation] = robot[0].split(" ");
   xPos = Number(xPos);
@@ -115,6 +118,7 @@ const getFinalPosition = (robot, xGrid, yGrid, lostPositions) => {
   const finalPositions = robotsMapped.map((robot) =>
     getFinalPosition(robot, xGrid, yGrid, lostPositions)
   );
+
   finalPositions.forEach((pos) => {
     if (pos[3]) console.log(`${pos[0]} ${pos[1]} ${pos[2]} ${pos[3]}`);
     else console.log(`${pos[0]} ${pos[1]} ${pos[2]}`);
