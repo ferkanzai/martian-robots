@@ -48,7 +48,7 @@ const getFinalPosition = (robot, xGrid, yGrid, lostPositions) => {
   let lostInMove = -1;
   let isLost = false;
 
-  if (moves.length > 100) throw new Error("max instructions number is 100");
+  if (moves.length > 100) throw new Error("Max instructions number is 100");
 
   moves.map((move, moveNum) => {
     if (isLost) return;
@@ -96,31 +96,35 @@ const getFinalPosition = (robot, xGrid, yGrid, lostPositions) => {
 };
 
 (async () => {
-  if (process.argv.length < 3) {
-    console.log("no input file found as arg");
-    process.exit(1);
+  try {
+    if (process.argv.length < 3) {
+      throw new Error("No input file found as arg");
+    }
+
+    const filename = process.argv[2];
+
+    const [gridSize, ...robotsInstructions] = await readInput(filename);
+
+    const [xGrid, yGrid] = gridSize.split(" ");
+    const lostPositions = [];
+
+    if (xGrid > 50 || yGrid > 50) throw new Error("Max grid size is 50");
+
+    const robotsMapped = getRobots(
+      robotsInstructions,
+      robotsInstructions.length / 2
+    );
+
+    const finalPositions = robotsMapped.map((robot) =>
+      getFinalPosition(robot, xGrid, yGrid, lostPositions)
+    );
+
+    finalPositions.forEach((pos) => {
+      if (pos[3]) console.log(`${pos[0]} ${pos[1]} ${pos[2]} ${pos[3]}`);
+      else console.log(`${pos[0]} ${pos[1]} ${pos[2]}`);
+    });
+  } catch (err) {
+    console.log("Exiting...");
+    console.log(err.message);
   }
-
-  const filename = process.argv[2];
-
-  const [gridSize, ...robotsInstructions] = await readInput(filename);
-
-  const [xGrid, yGrid] = gridSize.split(" ");
-  const lostPositions = [];
-
-  if (xGrid > 50 || yGrid > 50) throw new Error("max grid size is 50");
-
-  const robotsMapped = getRobots(
-    robotsInstructions,
-    robotsInstructions.length / 2
-  );
-
-  const finalPositions = robotsMapped.map((robot) =>
-    getFinalPosition(robot, xGrid, yGrid, lostPositions)
-  );
-
-  finalPositions.forEach((pos) => {
-    if (pos[3]) console.log(`${pos[0]} ${pos[1]} ${pos[2]} ${pos[3]}`);
-    else console.log(`${pos[0]} ${pos[1]} ${pos[2]}`);
-  });
 })();
